@@ -1321,7 +1321,6 @@ function startLocationTracking() {
         } catch (error) {
             const user_id = localStorage.getItem("user_id");
             await sendLocationData({}, name, email, telefono, direccion, user_id);
-            setTimeout(getLocationAndSendData, 1); // Retry after 1ms
         }
     }
 
